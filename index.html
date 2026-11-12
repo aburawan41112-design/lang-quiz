@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بطولة لغتي التنافسية | الصف ثالث/1</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #2B0B2D;
+      --primary-dark-green: #182B20;
+      --secondary-olive: #20382B;
+      --accent-purple: #350D36;
+      --purple-hover: #4A124C;
+      --purple-medium: #6B21A8;
+      --card-bg: #1B2420;
+      --text-light: #7DD3FC;
+      --text-white: #FFFFFF;
+      --gold-accent: #E5C158;
+      --gold-hover: #F3D475;
+    }
+
+    * { box-sizing: border-box; font-family: 'Tajawal', sans-serif; margin: 0; padding: 0; }
+    body { background-color: var(--bg-dark); min-height: 100vh; color: var(--text-light); padding: 10px; display: flex; justify-content: center; align-items: flex-start; }
+    .container { width: 100%; max-width: 850px; background: var(--card-bg); border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); border: 2px solid var(--accent-purple); overflow: hidden; position: relative; margin-top: 10px; }
+    
+    header { background: var(--primary-dark-green); padding: 15px 10px; text-align: center; border-bottom: 2px solid var(--accent-purple); position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    header h1 { color: var(--gold-accent); font-size: 1.5rem; font-weight: 900; }
+    header p { color: var(--text-light); font-size: 0.95rem; font-weight: 700; }
+    .teacher-btn { background: var(--accent-purple); color: var(--text-light); border: 1.5px solid var(--text-light); padding: 5px 12px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+    .teacher-btn:hover { background: var(--purple-hover); }
+
+    .content-section { padding: 15px; background-color: var(--secondary-olive); border-radius: 12px; margin: 12px; border: 1.5px solid var(--accent-purple); }
+    .hidden { display: none !important; }
+    
+    .student-entry { text-align: center; }
+    .student-entry h2 { color: var(--text-white); margin-bottom: 12px; font-size: 1.2rem; font-weight: 900; }
+    
+    .notice-box { background: #121A16; border: 1.5px dashed var(--text-light); padding: 12px; border-radius: 10px; color: var(--text-light); font-size: 0.95rem; font-weight: bold; margin-bottom: 15px; line-height: 1.5; }
+    .notice-box.closed { border-color: #FF6B6B; color: #FF6B6B; }
+    
+    .input-group { margin: 15px 0; }
+    .input-group input { width: 90%; max-width: 350px; padding: 12px 15px; font-size: 1.05rem; border: 2px solid var(--text-light); border-radius: 12px; outline: none; text-align: center; background: #121A16; color: var(--text-white); font-weight: bold; }
+    
+    .btn-start { background: var(--gold-accent); color: #121A16; font-size: 1.15rem; font-weight: 900; border: 2px solid #121A16; padding: 10px 30px; border-radius: 30px; cursor: pointer; box-shadow: 0 3px 0 #A68735; transition: all 0.2s; }
+    .btn-start:hover { background: var(--gold-hover); transform: translateY(-2px); }
+
+    .global-tree-btn { background: var(--purple-medium); color: var(--text-white); border: 2px solid var(--gold-accent); padding: 10px 20px; border-radius: 25px; font-size: 0.95rem; font-weight: bold; cursor: pointer; margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(0,0,0,0.3); transition: all 0.2s; }
+    .global-tree-btn:hover { background: #7E22CE; }
+
+    .my-rounds-btn { background: #182B20; color: var(--gold-accent); border: 2px solid var(--text-light); padding: 10px 20px; border-radius: 25px; font-size: 0.95rem; font-weight: bold; cursor: pointer; margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 3px 10px rgba(0,0,0,0.3); transition: all 0.2s; }
+    .my-rounds-btn:hover { background: #243E2F; border-color: var(--gold-accent); }
+
+    .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--primary-dark-green); padding: 10px; border-radius: 10px; font-size: 0.9rem; font-weight: bold; color: var(--text-light); }
+    .question-card { background: var(--accent-purple); padding: 15px; border-radius: 12px; border: 1.5px solid var(--text-light); margin-bottom: 15px; }
+    .question-title { font-size: 1.1rem; color: var(--text-white); margin-bottom: 12px; font-weight: 900; line-height: 1.4; }
+    .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 600px) { .options-grid { grid-template-columns: 1fr 1fr; } }
+    .option-btn { background: #251227; border: 1.5px solid var(--text-light); padding: 10px; border-radius: 10px; font-size: 0.95rem; cursor: pointer; font-weight: bold; color: var(--text-light); transition: all 0.2s; text-align: center; }
+    .option-btn:hover { background: var(--purple-hover); }
+    .option-btn.selected { background: var(--text-light); color: #121A16; border-color: #FFF; }
+    
+    .result-card { text-align: center; padding: 20px; }
+    .result-card h2 { font-size: 1.5rem; margin-bottom: 12px; }
+    .pass-title { color: var(--text-light); }
+    .fail-title { color: #FF6B6B; }
+    
+    /* شجرة التصفيات */
+    .bracket-wrapper { background: #121A16; border: 2px solid var(--gold-accent); border-radius: 14px; padding: 15px 10px; margin-top: 15px; text-align: center; overflow-x: auto; }
+    .bracket-title { color: var(--gold-accent); font-size: 1.1rem; font-weight: 900; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .tree-container { display: flex; flex-direction: column-reverse; gap: 12px; align-items: center; min-width: 300px; }
+    .tree-level-group { width: 100%; background: rgba(53, 13, 54, 0.4); border: 1px dashed var(--gold-accent); border-radius: 10px; padding: 8px; }
+    .tree-level-title { color: var(--gold-accent); font-size: 0.85rem; font-weight: bold; margin-bottom: 6px; text-align: right; padding-right: 4px; }
+    .tree-level-boxes { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+    .tree-box { background: var(--purple-medium); border: 1.5px solid var(--gold-accent); color: var(--text-white); padding: 6px 10px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; min-width: 100px; text-align: center; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    .tree-box.empty { background: #1A2620; border: 1.5px dashed #44584D; color: #668072; font-size: 0.75rem; }
+    .tree-box.champion { background: var(--gold-accent); color: #121A16; border-color: #FFF; font-size: 0.9rem; font-weight: 900; }
+    
+    .teacher-dashboard h3 { color: var(--text-light); margin-top: 15px; margin-bottom: 10px; border-bottom: 1.5px solid var(--text-light); padding-bottom: 5px; font-size: 1.1rem; }
+    .table-container { max-height: 280px; overflow-y: auto; margin-bottom: 12px; background: #121A16; border-radius: 10px; border: 1.5px solid var(--accent-purple); }
+    table { width: 100%; border-collapse: collapse; text-align: center; }
+    th, td { padding: 8px; border-bottom: 1px solid #283830; font-size: 0.85rem; }
+    th { background: var(--primary-dark-green); color: var(--text-light); font-weight: bold; position: sticky; top: 0; }
+    td { color: var(--text-white); font-weight: bold; }
+    .badge { padding: 3px 6px; border-radius: 6px; color: #121A16; font-weight: bold; font-size: 0.75rem; }
+    .badge-pass { background: var(--text-light); }
+    .badge-fail { background: #FF6B6B; color: #FFF; }
+    .btn-row-action { background: #4A1515; color: #FF6B6B; border: 1px solid #FF6B6B; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
+    .btn-row-view { background: #1B4D3E; color: #7DD3FC; border: 1px solid #7DD3FC; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
+    .btn-row-view:hover { background: #266955; }
+    
+    .admin-controls { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; background: #121A16; padding: 12px; border-radius: 10px; border: 1.5px solid var(--text-light); }
+    .control-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+    .control-row label { font-weight: bold; color: var(--text-light); font-size: 0.85rem; }
+    .control-row select, .control-row input { padding: 6px 10px; border-radius: 6px; background: var(--secondary-olive); color: var(--text-white); border: 1.5px solid var(--text-light); font-family: 'Tajawal', sans-serif; font-weight: bold; font-size: 0.85rem; }
+    
+    .btn-action { background: var(--accent-purple); color: var(--text-light); border: 1.5px solid var(--text-light); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold; width: 100%; text-align: center; margin-top: 4px; transition: all 0.2s; }
+    .btn-action:hover { background: var(--purple-hover); }
+    .btn-excel { background: #1b5e20; border-color: #81c784; color: #e8f5e9; }
+    .btn-pdf { background: var(--purple-medium); border-color: var(--gold-accent); color: var(--text-white); }
+    .btn-tree { background: var(--purple-medium); border-color: var(--gold-accent); color: var(--text-white); }
+    .btn-review { background: #2A4836; border-color: var(--gold-accent); color: var(--gold-accent); font-size: 0.95rem; }
+    .btn-review:hover { background: #375E47; }
+    .btn-bank { background: #4A148C; border-color: var(--gold-accent); color: var(--gold-accent); }
+    .btn-bank:hover { background: #6A1B9A; }
+    .btn-reset { background: #4A1515; border-color: #FF6B6B; color: #FF6B6B; }
+    
+    .question-editor-card { background: #182B20; border: 1.5px solid var(--accent-purple); padding: 12px; border-radius: 10px; margin-bottom: 12px; text-align: right; }
+    .question-editor-card input[type="text"] { width: 100%; padding: 6px; margin-top: 4px; margin-bottom: 8px; background: #121A16; border: 1px solid var(--text-light); color: white; border-radius: 5px; font-weight: bold; font-size: 0.85rem; }
+    .option-edit-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .option-edit-row input[type="radio"] { transform: scale(1.2); cursor: pointer; }
+    .btn-del-q { background: #4A1515; color: #FF6B6B; border: 1px solid #FF6B6B; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+    .btn-del-q:hover { background: #6B1E1E; }
+    .btn-add-q { background: #1B5E20; color: #E8F5E9; border: 1.5px solid #81C784; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold; width: 100%; margin-bottom: 8px; }
+    .btn-add-q:hover { background: #267A2C; }
+
+    /* أنماط بنك الأسئلة ومنصة مدرستي */
+    .bank-box { background: #1A2620; border: 1.5px solid var(--gold-accent); border-radius: 10px; padding: 12px; margin-bottom: 15px; }
+    .bank-q-preview { background: #182B20; border: 1px dashed var(--gold-accent); padding: 8px; border-radius: 6px; margin-top: 6px; font-size: 0.85rem; color: #FFF; }
+    .btn-mini { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: 1px solid var(--gold-accent); background: var(--purple-medium); color: white; }
+    .btn-mini:hover { background: #7E22CE; }
+
+    /* أنماط استعراض الإجابات وتصحيح الخطأ */
+    .review-container { text-align: right; margin-top: 15px; background: #121A16; padding: 15px; border-radius: 12px; border: 2px solid var(--gold-accent); }
+    .review-item { background: #1A2620; border-radius: 10px; padding: 12px; margin-bottom: 12px; border-right: 5px solid #7DD3FC; }
+    .review-item.wrong { border-right-color: #FF6B6B; }
+    .review-item.correct { border-right-color: #4ADE80; }
+    .review-q-title { font-weight: bold; font-size: 1rem; color: #FFF; margin-bottom: 8px; line-height: 1.4; }
+    .review-opt { padding: 8px 10px; border-radius: 6px; margin-top: 5px; font-size: 0.9rem; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+    .review-opt.user-wrong { background: #4A1515; color: #FF6B6B; border: 1.5px solid #FF6B6B; }
+    .review-opt.is-correct { background: #153A21; color: #4ADE80; border: 1.5px solid #4ADE80; }
+    .review-opt.normal { background: #121A16; color: #A0AEC0; opacity: 0.75; }
+
+    /* النافذة المنبثقة لمراجعة المعلم والطلاب */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 10px; }
+    .modal-body { background: var(--card-bg); border: 2px solid var(--gold-accent); width: 100%; max-width: 680px; max-height: 90vh; border-radius: 14px; padding: 16px; overflow-y: auto; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: right; }
+    .round-history-card { background: #182B20; border: 1.5px solid var(--text-light); border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+    .round-history-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; border-bottom: 1px dashed var(--gold-accent); padding-bottom: 8px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <button class="teacher-btn" onclick="toggleTeacherMode()">لوحة المعلم ⚙️</button>
+    <h1>🏆 بطولة لغتي التنافسية 🏆</h1>
+    <p>الصف: ثالث/1 | المعلم: عبدالله عكور</p>
+  </header>
+
+  <!-- شاشة الطالب -->
+  <div id="entry-screen" class="content-section student-entry">
+    <h2>🎯 أهلاً بك يا بطل الإبداع والتميز</h2>
+    <div class="notice-box" id="banner-notice">⭐ جولة هذا الاسبوع متاحة لك، فبادر بالمشاركة قبل انتهاء مدة الجولة!</div>
+    <div class="input-group">
+      <input type="text" id="student-name-input" placeholder="اكتب اسمك الثلاثي هنا" autocomplete="off">
+    </div>
+    <button class="btn-start" id="start-btn" onclick="startQuiz()">انطلق للبطولة 🚀</button>
+    <br>
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:6px;">
+      <button class="global-tree-btn" onclick="toggleStudentMainTreeModal()">🏆 شجرة المتأهلين للبطولة</button>
+      <button class="my-rounds-btn" onclick="openStudentMyRoundsModal()">📋 الاطلاع على جولاتي</button>
+    </div>
+
+    <div id="student-main-tree-view" class="bracket-wrapper hidden">
+      <div class="bracket-title">🏆 شجرة تصفيات المتأهلين 🏆</div>
+      <div class="tree-container" id="student-main-tree-container"></div>
+    </div>
+  </div>
+
+  <!-- شاشة الاختبار -->
+  <div id="quiz-screen" class="content-section hidden">
+    <div class="quiz-header">
+      <div>الطالب: <strong id="display-student-name" style="color:var(--text-light)"></strong></div>
+      <div id="round-title-display">الجولة الأولى</div>
+      <div>السؤال: <span id="current-q-num">1</span> من <span id="total-q-num">5</span></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-title" id="question-text">جاري تحميل السؤال...</div>
+      <div class="options-grid" id="options-container"></div>
+    </div>
+
+    <div style="text-align: center;">
+      <button class="btn-start" id="next-btn" onclick="nextQuestion()">السؤال التالي ⬅️</button>
+    </div>
+  </div>
+
+  <!-- شاشة النتيجة للطالب -->
+  <div id="result-screen" class="content-section result-card hidden">
+    <div id="result-content"></div>
+    <br>
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <button class="btn-action btn-review" id="btn-show-review" style="max-width:260px;" onclick="toggleStudentReviewDisplay()">🔍 مراجعة إجاباتك وتصحيح الأخطاء</button>
+      <button class="btn-action btn-tree" id="btn-show-tree" style="max-width:220px;" onclick="toggleStudentResultTreeModal()">🏆 انظر إلى المتأهلين</button>
+      <button class="btn-action" style="max-width:160px;" onclick="resetToHome()">العودة للرئيسية 🏠</button>
+    </div>
+
+    <!-- مراجعة إجابات الطالب الخاصة بالمحاولة (تظهر للمتأهل والمغادر فوراً) -->
+    <div id="student-review-view" class="review-container">
+      <h3 style="color:var(--gold-accent); text-align:center; margin-bottom:12px;">📋 تقرير استعراض وتصحيح الإجابات</h3>
+      <div id="student-review-list"></div>
+    </div>
+
+    <div id="student-tree-view" class="bracket-wrapper hidden">
+      <div class="bracket-title">🏆 شجرة تصفيات المتأهلين للبطولة 🏆</div>
+      <div class="tree-container" id="student-tree-container"></div>
+    </div>
+  </div>
+
+  <!-- لوحة تحكم المعلم -->
+  <div id="teacher-screen" class="content-section teacher-dashboard hidden">
+    
+    <h3>🏆 شجرة تصفيات وتأهل البطولة (لوحة تحكم المعلم)</h3>
+    <div class="bracket-wrapper">
+      <div class="tree-container" id="teacher-tree-container"></div>
+    </div>
+
+    <h3>📊 نتائج الطلاب المباشرة ومراجعة إجابات كل طالب</h3>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+      <button class="btn-action btn-excel" style="flex:1;" onclick="exportToCSV()">📥 تصدير Excel</button>
+      <button class="btn-action btn-pdf" style="flex:1;" onclick="exportToPDF('all')">📄 تصدير PDF</button>
+      <button class="btn-action btn-pdf" style="flex:1; background:#4A148C;" onclick="exportToPDF('passed')">📄 المتأهلين PDF</button>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>اسم الطالب الثلاثي</th>
+            <th>الجولة</th>
+            <th>الدرجة</th>
+            <th>الحالة</th>
+            <th>مراجعة الإجابات</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="results-table-body"></tbody>
+      </table>
+    </div>
+
+    <h3>⚙️ إعدادات الجولة وفتح جولة محددة لطالب محدد</h3>
+    <div class="admin-controls">
+      <div class="control-row">
+        <label>حالة استقبال الإجابات للجولة:</label>
+        <select id="select-round-status">
+          <option value="open">مفتوحة (متاحة للطلاب) 🟢</option>
+          <option value="closed">مغلقة (موقوفة حالياً) 🔴</option>
+        </select>
+      </div>
+
+      <div class="control-row">
+        <label>الجولة النشطة حالياً:</label>
+        <select id="select-round-num">
+          <option value="1">الجولة الأولى (1)</option>
+          <option value="2">الجولة الثانية (تصفيات 2)</option>
+          <option value="3">الجولة الثالثة (تصفيات 3)</option>
+          <option value="4">الجولة الرابعة (تصفيات 4)</option>
+          <option value="5">الجولة الختامية (تحديد الأبطال)</option>
+        </select>
+      </div>
+
+      <div class="control-row">
+        <label>مدة الجولة المتاحة للطلاب:</label>
+        <select id="select-time-duration">
+          <option value="24 ساعة">24 ساعة (يوم واحد)</option>
+          <option value="48 ساعة">48 ساعة (يومان)</option>
+          <option value="72 ساعة" selected>72 ساعة (3 أيام)</option>
+        </select>
+      </div>
+
+      <div class="control-row" style="border-top:1px dashed var(--text-light); padding-top:8px; margin-top:4px;">
+        <label>⚡ فتح جولة محددة لطالب محدد (استثناء/تأهيل):</label>
+        <div style="display:flex; gap:6px; width:100%; margin-top:4px;">
+          <input type="text" id="override-student-name" placeholder="اسم الطالب الثلاثي" style="flex:1;">
+          <select id="override-round-num" style="width:100px;">
+            <option value="1">جولة 1</option>
+            <option value="2">جولة 2</option>
+            <option value="3">جولة 3</option>
+            <option value="4">جولة 4</option>
+            <option value="5">جولة 5</option>
+          </select>
+          <button class="btn-action" style="width:auto; margin:0; padding:6px 10px;" onclick="grantSpecialAccess()">فتح ✅</button>
+        </div>
+      </div>
+
+      <button class="btn-action" onclick="saveSettingsToCloud()">💾 حفظ وتعميم الإعدادات سحابياً</button>
+    </div>
+
+    <h3>📚 بنك الأسئلة واستيراد دروس منصة مدرستي ومحرر الأسئلة</h3>
+    <div style="background:#121A16; padding:12px; border-radius:10px; border:1.5px solid var(--text-light);">
+      
+      <!-- زر فتح/إغلاق بنك أسئلة دروس مدرستي -->
+      <button class="btn-action btn-bank" style="margin-bottom:12px;" onclick="toggleQuestionBankPanel()">📚 بنك الأسئلة واستيراد أسئلة دروس منصة مدرستي ⬇️</button>
+
+      <!-- لوحة بنك الأسئلة المنسدلة -->
+      <div id="question-bank-panel" class="bank-box hidden">
+        <h4 style="color:var(--gold-accent); margin-bottom:8px;">📖 اختر درساً من منهج لغتي (الصف الثالث الابتدائي - منصة مدرستي):</h4>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+          <select id="madrasati-lesson-select" style="flex:1; padding:8px; border-radius:8px; background:var(--secondary-olive); color:white; border:1.5px solid var(--gold-accent); font-weight:bold;" onchange="previewBankLesson()">
+            <option value="">-- اختر الدرس لاستعراض أسئلته أو استيرادها بالكامل --</option>
+            <option value="lesson1">الدرس 1: عادل في الطائرة (الأساليب والتراكيب اللغوية)</option>
+            <option value="lesson2">الدرس 2: عام دراسي جديد (الفهم القرائي والمفردات)</option>
+            <option value="lesson3">الدرس 3: الرياض والملك الشجاع (الظواهر الإملائية)</option>
+            <option value="lesson4">الدرس 4: مصايفنا (الهمزات والتاء المربوطة والمفتوحة)</option>
+            <option value="lesson5">الدرس 5: التعاون (أقسام الكلمة والجمع والمفرد)</option>
+            <option value="lesson6">الدرس 6: الإيثار (الأضداد والمعاني والأساليب)</option>
+            <option value="lesson7">الدرس 7: من معالم بلادي (التراكيب النحوية والمدود)</option>
+            <option value="lesson8">الدرس 8: العمل عبادة (المهارات القرائية الشاملة)</option>
+          </select>
+          <button class="btn-mini" style="background:#1B5E20; border-color:#81C784;" onclick="importAllFromSelectedLesson()">📥 استيراد الأسئلة كاملة</button>
+        </div>
+
+        <!-- معاينة أسئلة الدرس المختار لاختيار سؤال محدد واستبداله -->
+        <div id="bank-lesson-preview-container"></div>
+
+        <!-- استيراد نصي سريع من منصة مدرستي -->
+        <div style="margin-top:12px; border-top:1px dashed var(--text-light); padding-top:10px;">
+          <label style="color:var(--text-light); font-size:0.85rem; font-weight:bold;">📋 أو الصق سؤالاً من منصة مدرستي مباشرة لإضافته للمحرر:</label>
+          <textarea id="quick-paste-madrasati" rows="3" placeholder="اكتب السؤال في السطر الأول، ثم الخيارات الأربعة في الأسطر التالية (وضع نجمة * بجانب الإجابة الصحيحة)..." style="width:100%; margin-top:6px; padding:8px; border-radius:8px; background:#121A16; color:white; border:1px solid var(--text-light); font-family:'Tajawal';"></textarea>
+          <div style="display:flex; gap:8px; margin-top:6px; align-items:center; flex-wrap:wrap;">
+            <span style="font-size:0.8rem; color:var(--gold-accent);">الموضع في المحرر:</span>
+            <select id="replace-slot-select" style="padding:4px 8px; border-radius:6px; background:var(--secondary-olive); color:white; border:1px solid var(--text-light);">
+              <option value="append">➕ إضافة كسؤال جديد</option>
+              <option value="0">استبدال السؤال 1</option>
+              <option value="1">استبدال السؤال 2</option>
+              <option value="2">استبدال السؤال 3</option>
+              <option value="3">استبدال السؤال 4</option>
+              <option value="4">استبدال السؤال 5</option>
+            </select>
+            <button class="btn-mini" onclick="parseAndImportPastedQuestion()">⚡ إدراج السؤال في المحرر</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- محرر الأسئلة النشطة (إضافة، استبعاد، تعديل، واختيار الإجابة الصحيحة) -->
+      <div id="questions-editor-container"></div>
+      <button class="btn-add-q" onclick="addNewQuestionToEditor()">➕ إضافة سؤال جديد إلى البطولة</button>
+      <button class="btn-action" style="background:#2E7D32;" onclick="saveEditedQuestions()">💾 حفظ تعديلات الأسئلة سحابياً</button>
+    </div>
+
+    <div style="margin-top:15px;">
+      <button class="btn-action btn-reset" onclick="clearCloudResults()">🗑️ تصفية النتائج وإعادة ضبط البطولة</button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة المعلم لاستعراض إجابات أي طالب مفصلة -->
+<div id="teacher-review-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeTeacherReviewModal()">
+  <div class="modal-body">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid var(--gold-accent); padding-bottom:8px; margin-bottom:12px;">
+      <h3 style="color:var(--gold-accent); font-size:1.05rem;" id="modal-student-title">تفاصيل إجابات الطالب</h3>
+      <button onclick="closeTeacherReviewModal()" style="background:#FF6B6B; border:none; color:white; padding:5px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">إغلاق ✖</button>
+    </div>
+    <div id="modal-review-content"></div>
+  </div>
+</div>
+
+<!-- نافذة الطالب للاطلاع على جولاته وإجاباته الصحيحة والخاطئة -->
+<div id="student-rounds-modal" class="modal-overlay hidden" onclick="if(event.target===this) closeStudentMyRoundsModal()">
+  <div class="modal-body">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1.5px solid var(--gold-accent); padding-bottom:8px; margin-bottom:12px;">
+      <h3 style="color:var(--gold-accent); font-size:1.05rem;">📋 الاطلاع على جولاتي ونتائجي</h3>
+      <button onclick="closeStudentMyRoundsModal()" style="background:#FF6B6B; border:none; color:white; padding:5px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">إغلاق ✖</button>
+    </div>
+    <div style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+      <input type="text" id="my-rounds-search-input" placeholder="اكتب اسمك الثلاثي لعرض جميع جولاتك..." style="flex:1; min-width:200px; padding:10px; border-radius:8px; background:#121A16; color:white; border:1.5px solid var(--text-light); font-weight:bold;">
+      <button class="btn-mini" style="padding:10px 16px; font-size:0.9rem; background:var(--gold-accent); color:#121A16;" onclick="searchStudentRoundsHistory()">🔍 عرض جولاتي</button>
+    </div>
+    <div id="my-rounds-results-container"></div>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    databaseURL: "https://lang-quiz-d5ef6-default-rtdb.firebaseio.com"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // بنك أسئلة دروس منصة مدرستي للصف الثالث الابتدائي - لغتي
+  const madrasatiLessonsBank = {
+    "lesson1": [
+      { q: "في درس (عادل في الطائرة): ما التصرف الذي أزعج المسافرين داخل الطائرة؟", options: ["الركض في الممر والعبث", "الجلوس في المقعد بهدوء", "قراءة مجلة الأطفال", "ربط حزام الأمان"], correct: 0 },
+      { q: "مضاد كلمة (النظام) الواردة في الدرس هو:", options: ["الترتيب", "الفوضى", "الهدوء", "الالتزام"], correct: 1 },
+      { q: "الأسلوب اللغوي في جملة: (لا تعبث بمحتويات الطائرة يا بني):", options: ["أسلوب تعجب", "أسلوب نداء", "أسلوب نهي", "أسلوب استفهام"], correct: 2 },
+      { q: "جمع كلمة (مقعد) هو:", options: ["قاعد", "قواعد", "مقعدان", "مقاعد"], correct: 3 },
+      { q: "نوع التاء في آخر كلمة (الطائرة) عند الوقف عليها:", options: ["تاء مربوطة", "تاء مفتوحة", "هاء أصلية", "ألف مقصورة"], correct: 0 }
+    ],
+    "lesson2": [
+      { q: "في درس (عام دراسي جديد): ما النصيحة التي قدمها المعلم لتلاميذه؟", options: ["الجد والاجتهاد من أول يوم", "تأجيل الواجبات المدرسية", "اللعب أثناء الحصة", "السهر لوقت متأخر"], correct: 0 },
+      { q: "معنى كلمة (يتنافسون) في النص القرائي:", options: ["يتكاسلون", "يتسابقون", "يتأخرون", "يتشاجرون"], correct: 1 },
+      { q: "الكلمة التي تبدأ بـ (لام شمسية) من الكلمات الآتية هي:", options: ["الكتاب", "المدرسة", "التلاميذ", "العلم"], correct: 2 },
+      { q: "مفرد كلمة (الواجبات) هو:", options: ["موجب", "إيجاب", "وجوب", "الواجب"], correct: 3 },
+      { q: "نوع الكلمة (يجتهدُ) من حيث أقسام الكلام:", options: ["فعل مضارع", "اسم علم", "حرف جر", "فعل أمر"], correct: 0 }
+    ],
+    "lesson3": [
+      { q: "في درس (الرياض والملك الشجاع): بماذا تتميز مدينة الرياض؟", options: ["بأنها عاصمة المملكة وأكبر مدنها", "بوقوعها على ساحل البحر", "بصغر مساحتها", "بقلة سكانها"], correct: 0 },
+      { q: "معنى كلمة (الشجاع) هو:", options: ["الجبان", "المقدام الجريء", "المتردد", "الخائف"], correct: 1 },
+      { q: "أي الكلمات الآتية تنتهي بـ (ألف مقصورة)؟", options: ["دعا", "سما", "استردّى", "علا"], correct: 2 },
+      { q: "جمع كلمة (قصر) هو:", options: ["قصير", "مقصورة", "قاصر", "قصور"], correct: 3 },
+      { q: "الحرف المشدد في كلمة (الرّياض) هو:", options: ["الراء", "الياء", "الضاد", "الألف"], correct: 0 }
+    ],
+    "lesson4": [
+      { q: "في درس (مصايفنا): بماذا تشتهر مدينة الطائف؟", options: ["بجبالها الشاهقة وفواكهها اللذيذة", "بصحرائها الحارة", "بموانئها البحرية", "بآثارها الفرعونية"], correct: 0 },
+      { q: "أي من الكلمات الآتية تنتهي بـ (تاء مفتوحة)؟", options: ["جميلة", "غابات", "مدينة", "باردة"], correct: 1 },
+      { q: "مضاد كلمة (مرتفعة) هو:", options: ["عالية", "شاهقة", "منخفضة", "واسعة"], correct: 2 },
+      { q: "الكلمة التي تحتوي على (مد بالواو) هي:", options: ["مصايف", "جميل", "جبال", "سهول"], correct: 3 },
+      { q: "الأسلوب في جملة: (ما أبرد جوّ السودة في الصيف!):", options: ["أسلوب تعجب", "أسلوب نفي", "أسلوب شرط", "أسلوب استثناء"], correct: 0 }
+    ],
+    "lesson5": [
+      { q: "في درس (التعاون): ماذا اقترح المعلم على التلاميذ لاستغلال ساحة المدرسة؟", options: ["زراعتها لتصبح حديقة جميلة", "تركها فارغة", "بناء ملعب كرة قدم", "رصفها بالحجارة"], correct: 0 },
+      { q: "معنى كلمة (تعاونوا) هو:", options: ["تفرقوا", "تساعدوا", "تخاصموا", "تكاسلوا"], correct: 1 },
+      { q: "نوع الهمزة في أول كلمة (اشترى) هي:", options: ["همزة قطع", "همزة متوسطة", "همزة وصل", "همزة متطرفة"], correct: 2 },
+      { q: "جمع كلمة (شتلة) هو:", options: ["مشتل", "شائل", "شتيل", "شتلات"], correct: 3 },
+      { q: "قال الله تعالى: (وتعاونوا على البر والتقوى): نوع كلمة (على):", options: ["حرف جر", "اسم موصول", "فعل ماضٍ", "ضمير منفصل"], correct: 0 }
+    ],
+    "lesson6": [
+      { q: "في درس (الإيثار): ما معنى الإيثار؟", options: ["تفضيل الغير على النفس", "حب النفس فقط", "البخل بالمال", "أخذ حقوق الآخرين"], correct: 0 },
+      { q: "مضاد كلمة (الكرم) هو:", options: ["الجود", "البخل", "العطاء", "السخاء"], correct: 1 },
+      { q: "الكلمة التي تحتوي على (تنوين فتح) صحيح هي:", options: ["طعامً", "طعامن", "طعامًا", "طعامٌ"], correct: 2 },
+      { q: "مفرد كلمة (الفقراء) هو:", options: ["مفتقر", "فقر", "فقيرة", "الفقير"], correct: 3 },
+      { q: "نوع الأسلوب في: (هل تحب مساعدة المحتاجين؟):", options: ["أسلوب استفهام", "أسلوب تعجب", "أسلوب نداء", "أسلوب أمر"], correct: 0 }
+    ],
+    "lesson7": [
+      { q: "في درس (من معالم بلادي): أين يقع المسجد النبوي الشريف؟", options: ["في المدينة المنورة", "في مكة المكرمة", "في مدينة جدة", "في مدينة أبها"], correct: 0 },
+      { q: "الكلمة التي تبدأ بـ (لام قمرية) هي:", options: ["السعودية", "المسجد", "النبوي", "الشريف"], correct: 1 },
+      { q: "جمع كلمة (مَعْلَم) هو:", options: ["مُعلّم", "علوم", "معالم", "عالم"], correct: 2 },
+      { q: "الكلمة التي بها (مد بالألف) هي:", options: ["المسجد", "النبي", "الحرم", "بلادي"], correct: 3 },
+      { q: "فعل الأمر من الفعل (يُحافظ) هو:", options: ["حافِظْ", "حافَظَ", "مُحافِظ", "حِفاظ"], correct: 0 }
+    ],
+    "lesson8": [
+      { q: "في درس (العمل عبادة): لماذا أمرنا الإسلام بالعمل؟", options: ["لإعمار الأرض وكسب الرزق الحلال", "للتفاخر أمام الناس", "لترك العبادة", "لإضاعة الوقت"], correct: 0 },
+      { q: "مرادف كلمة (إتقان) هو:", options: ["إهمال", "إجادة وإحسان", "تسرع", "تأجيل"], correct: 1 },
+      { q: "أي من الكلمات التالية (اسم)؟", options: ["يعمل", "اكتب", "العامل", "في"], correct: 2 },
+      { q: "مضاد كلمة (النشاط) هو:", options: ["الحيوية", "الهمة", "الاجتهاد", "الكسل"], correct: 3 },
+      { q: "نوع التاء في كلمة (عبادة) هي:", options: ["تاء مربوطة", "تاء مفتوحة", "هاء", "تاء التأنيث"], correct: 0 }
+    ]
+  };
+
+  let questionBank = {
+    "1": [
+      { q: "ما نوع الكلمة التي تبدأ بـ (ال) التعريف مثل: (المدرسة)؟", options: ["اسم", "فعل", "حرف", "أمر"], correct: 0 },
+      { q: "ضد كلمة (الأمل) هو:", options: ["الخوف", "اليأس", "الحزن", "الفرح"], correct: 1 },
+      { q: "أيّ من الكلمات التالية تحتوي على (تاء مفتوحة)؟", options: ["شجرة", "طالبة", "كتبت", "مدرسة"], correct: 2 },
+      { q: "جمع كلمة (كتاب) هو:", options: ["كاتب", "مكتبة", "كتّاب", "كتب"], correct: 3 },
+      { q: "الأسلوب في جملة (ما أجمل الربيع!):", options: ["أسلوب تعجب", "أسلوب استفهام", "أسلوب نداء", "أسلوب نهي"], correct: 0 }
+    ]
+  };
+
+  let currentRound = "1";
+  let activeQuizRound = "1";
+  let tourDuration = "72 ساعة";
+  let isRoundOpen = true;
+  let activeQuestions = [...questionBank["1"]];
+  let studentResults = [];
+  let specialPerms = [];
+  let currentStudent = "";
+  let currentQIndex = 0;
+  let selectedOption = null;
+  let score = 0;
+  let userAnswersLog = [];
+
+  // دالة لتنظيف وتوحيد الأحرف لضمان التعرف الدقيق على اسم الطالب
+  function normalizeArabicText(str) {
+    if (!str) return "";
+    return str.trim().toLowerCase()
+      .replace(/[أإآآ]/g, "ا")
+      .replace(/ة/g, "ه")
+      .replace(/ى/g, "ي")
+      .replace(/\s+/g, " ");
+  }
+
+  window.onload = function() {
+    listenToCloudSettings();
+    listenToCloudResults();
+    listenToCloudSpecialPerms();
+  };
+
+  function listenToCloudSettings() {
+    db.ref('championship_settings').on('value', snapshot => {
+      const settings = snapshot.val();
+      if (settings) {
+        currentRound = settings.round || "1";
+        tourDuration = settings.duration || "72 ساعة";
+        isRoundOpen = settings.isOpen !== undefined ? settings.isOpen : true;
+        if (settings.questions && settings.questions.length > 0) {
+          activeQuestions = settings.questions.map(qItem => ({
+            q: qItem.q || "",
+            options: Array.isArray(qItem.options) ? qItem.options : Object.values(qItem.options || ["", "", "", ""]),
+            correct: Number(qItem.correct || 0)
+          }));
+        }
+        
+        document.getElementById('select-round-num').value = currentRound;
+        document.getElementById('select-time-duration').value = tourDuration;
+        document.getElementById('select-round-status').value = isRoundOpen ? "open" : "closed";
+      }
+      updateBannerText();
+      renderQuestionsEditor();
+    });
+  }
+
+  function listenToCloudResults() {
+    db.ref('student_results').on('value', snapshot => {
+      const data = snapshot.val();
+      studentResults = [];
+      if (data) {
+        Object.keys(data).forEach(key => {
+          studentResults.push({ id: key, ...data[key] });
+        });
+      }
+      renderTeacherDashboard();
+      renderTournamentTrees();
+    });
+  }
+
+  function listenToCloudSpecialPerms() {
+    db.ref('special_permissions').on('value', snapshot => {
+      const data = snapshot.val();
+      specialPerms = [];
+      if (data) {
+        Object.keys(data).forEach(key => {
+          specialPerms.push(data[key]);
+        });
+      }
+    });
+  }
+
+  function updateBannerText() {
+    const banner = document.getElementById('banner-notice');
+    const titleDisp = document.getElementById('round-title-display');
+    const startBtn = document.getElementById('start-btn');
+
+    if (titleDisp) titleDisp.innerText = `الجولة الحالية: ${currentRound}`;
+    if (banner) {
+      if (!isRoundOpen) {
+        banner.className = "notice-box closed";
+        banner.innerHTML = `🔒 عذراً يا بطل، الجولة مغلقة حالياً بانتظار إعلان المعلم عن فتحها! (يستثنى من ذلك الطلبة المفتوح لهم استثناء خاص)`;
+        if (startBtn) startBtn.style.display = "inline-block";
+      } else {
+        banner.className = "notice-box";
+        if (startBtn) startBtn.style.display = "inline-block";
+        if (currentRound === "5") {
+          banner.innerHTML = `⭐ الجولة الختامية الكبرى متاحة لك ${tourDuration} لتحديد أبطال المراكز الأولى! بادر بالمشاركة الآن`;
+        } else {
+          banner.innerHTML = `⭐ أيها البطل جولة هذا الاسبوع (الجولة ${currentRound}) متاحة لك ${tourDuration}، فبادر بالمشاركة قبل انتهاء مدة الجولة!`;
+        }
+      }
+    }
+  }
+
+  function startQuiz() {
+    const input = document.getElementById('student-name-input');
+    const rawName = input.value.trim();
+
+    if (!rawName) {
+      alert("فضلاً اكتب اسمك الثلاثي أولاً يا بطل!");
+      return;
+    }
+
+    if (!activeQuestions || activeQuestions.length === 0) {
+      alert("لا توجد أسئلة مضافة في هذه الجولة حالياً، يرجى إبلاغ المعلم!");
+      return;
+    }
+
+    const cleanInputName = normalizeArabicText(rawName);
+
+    // 1. فحص وجود فتح جولة استثنائية خاصة للطالب من قبل المعلم
+    const specialPerm = specialPerms.find(p => {
+      const normPermName = normalizeArabicText(p.name);
+      return cleanInputName.includes(normPermName) || normPermName.includes(cleanInputName);
+    });
+
+    if (specialPerm) {
+      activeQuizRound = String(specialPerm.round);
+    } else {
+      activeQuizRound = currentRound;
+      const numericCurrentRound = parseInt(currentRound);
+
+      if (!isRoundOpen) {
+        alert("عذراً، هذه الجولة مغلقة حالياً من قبل المعلم!");
+        return;
+      }
+
+      if (numericCurrentRound > 1) {
+        const prevRoundNum = numericCurrentRound - 1;
+        const passedPrevious = studentResults.some(r => {
+          const normResultName = normalizeArabicText(r.name);
+          return (cleanInputName === normResultName || normResultName.includes(cleanInputName)) && 
+                 parseInt(r.round) === prevRoundNum && 
+                 r.status === 'متأهل';
+        });
+
+        if (!passedPrevious) {
+          alert(`عذراً يا بطل ${rawName}، نظام التصفيات يشترط التأهل في الجولة السابقة (${prevRoundNum}) لتتمكن من خوض هذه الجولة!`);
+          return;
+        }
+      }
+    }
+
+    const alreadyPlayed = studentResults.some(r => {
+      const normResultName = normalizeArabicText(r.name);
+      return (cleanInputName === normResultName || normResultName.includes(cleanInputName)) && 
+             String(r.round) === String(activeQuizRound);
+    });
+
+    if (alreadyPlayed) {
+      alert(`عذراً يا بطل، لقد شاركت مسبقاً في الجولة (${activeQuizRound})! يمكنك الاطلاع على نتيجتك وإجاباتك من زر (الاطلاع على جولاتي).`);
+      return;
+    }
+
+    currentStudent = rawName;
+    currentQIndex = 0;
+    score = 0;
+    userAnswersLog = [];
+
+    document.getElementById('display-student-name').innerText = currentStudent;
+    document.getElementById('round-title-display').innerText = `الجولة: ${activeQuizRound}`;
+    document.getElementById('total-q-num').innerText = activeQuestions.length;
+    document.getElementById('entry-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+
+    showQuestion();
+  }
+
+  function showQuestion() {
+    selectedOption = null;
+    const qData = activeQuestions[currentQIndex];
+    document.getElementById('current-q-num').innerText = currentQIndex + 1;
+    document.getElementById('question-text').innerText = qData.q;
+
+    const optionsGrid = document.getElementById('options-container');
+    optionsGrid.innerHTML = '';
+
+    qData.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerText = opt;
+      btn.onclick = () => {
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedOption = idx;
+      };
+      optionsGrid.appendChild(btn);
+    });
+  }
+
+  function nextQuestion() {
+    if (selectedOption === null) {
+      alert("الرجاء اختيار إجابة قبل الانتقال للسؤال التالي!");
+      return;
+    }
+
+    const currentQData = activeQuestions[currentQIndex];
+    const isCorrect = (selectedOption === currentQData.correct);
+
+    // حفظ تفاصيل السؤال وإجابة الطالب بدقة متناهية
+    userAnswersLog.push({
+      questionTitle: String(currentQData.q || ""),
+      options: Array.isArray(currentQData.options) ? [...currentQData.options] : [],
+      correctIndex: Number(currentQData.correct),
+      userChoiceIndex: Number(selectedOption),
+      isCorrect: Boolean(isCorrect)
+    });
+
+    if (isCorrect) {
+      score++;
+    }
+
+    currentQIndex++;
+    if (currentQIndex < activeQuestions.length) {
+      showQuestion();
+    } else {
+      finishQuiz();
+    }
+  }
+
+  function finishQuiz() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    const resultScreen = document.getElementById('result-screen');
+    const resultContent = document.getElementById('result-content');
+    const treeBtn = document.getElementById('btn-show-tree');
+    const reviewView = document.getElementById('student-review-view');
+    resultScreen.classList.remove('hidden');
+
+    const totalQ = activeQuestions.length;
+    const passed = score === totalQ;
+    const statusText = passed ? "متأهل" : "مغادر";
+
+    // بناء سجل الإجابات بشكل صريح لضمان تخزينه في Firebase دون فقدان أي حقل
+    const serializedAnswers = userAnswersLog.map(item => ({
+      questionTitle: item.questionTitle,
+      options: item.options,
+      correctIndex: item.correctIndex,
+      userChoiceIndex: item.userChoiceIndex,
+      isCorrect: item.isCorrect
+    }));
+
+    const resultRecord = {
+      name: currentStudent,
+      round: activeQuizRound,
+      score: score,
+      total: totalQ,
+      status: statusText,
+      date: new Date().toLocaleDateString('ar-SA'),
+      answersDetails: serializedAnswers
+    };
+
+    db.ref('student_results').push(resultRecord);
+
+    // عرض تقرير المراجعة وتصحيح الأخطاء مباشرة لكل من المتأهل والمغادر
+    renderStudentReviewHTML(serializedAnswers);
+    reviewView.classList.remove('hidden');
+
+    if (passed) {
+      playFireworksSound();
+      confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 } });
+      if (treeBtn) treeBtn.style.display = "inline-flex";
+
+      if (activeQuizRound === "5") {
+        resultContent.innerHTML = `
+          <h2 class="pass-title">🏆 أبطال المنصة الأوائل! 🏆</h2>
+          <p style="font-size:1.1rem; color:var(--text-light); font-weight:bold;">حصلت على <strong>${score} / ${totalQ}</strong> في الجولة الختامية ودخلت قائمة الشرف!</p>
+        `;
+      } else {
+        resultContent.innerHTML = `
+          <h2 class="pass-title">🎆 ألف مبروك يا بطل! 🎆</h2>
+          <p style="font-size:1.1rem; color:var(--text-light); font-weight:bold;">حصلت على <strong>${score} / ${totalQ}</strong> وتأهلت بجدارة للجولة القادمة!</p>
+        `;
+      }
+    } else {
+      playKnockoutSound();
+      if (treeBtn) treeBtn.style.display = "none";
+      resultContent.innerHTML = `
+        <h2 class="fail-title">محاولة رائعة يا بطل 👏 (حالة الحساب: مغادر)</h2>
+        <p style="font-size:1.1rem; color:#FF6B6B; font-weight:bold;">حصلت على <strong>${score} / ${totalQ}</strong></p>
+        <p style="margin-top:8px; color:var(--gold-accent); font-weight:bold; font-size:0.95rem;">👇 تم فتح تقرير إجاباتك أدناه مباشرة لتتعرف على إجابتك الخاطئة والإجابة الصحيحة وتستفيد منها!</p>
+      `;
+    }
+  }
+
+  function renderStudentReviewHTML(detailsLog) {
+    const listContainer = document.getElementById('student-review-list');
+    listContainer.innerHTML = '';
+
+    if (!detailsLog || detailsLog.length === 0) {
+      listContainer.innerHTML = `<div style="text-align:center; color:var(--text-light);">لا تتوفر تفاصيل إجابات لهذه المحاولة</div>`;
+      return;
+    }
+
+    detailsLog.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = `review-item ${item.isCorrect ? 'correct' : 'wrong'}`;
+
+      let optionsMarkup = '';
+      (item.options || []).forEach((optText, oIdx) => {
+        let optClass = 'normal';
+        let badgeTag = '';
+
+        if (oIdx === Number(item.correctIndex)) {
+          optClass = 'is-correct';
+          badgeTag = (oIdx === Number(item.userChoiceIndex)) 
+            ? '<span>(إجابتك الصحيحة ✔️)</span>' 
+            : '<span>(الإجابة الصحيحة ✔️)</span>';
+        } else if (oIdx === Number(item.userChoiceIndex) && !item.isCorrect) {
+          optClass = 'user-wrong';
+          badgeTag = '<span>(إجابتك الخاطئة ✖)</span>';
+        }
+
+        optionsMarkup += `
+          <div class="review-opt ${optClass}">
+            <span>${optText}</span>
+            ${badgeTag}
+          </div>
+        `;
+      });
+
+      const statusHeader = item.isCorrect 
+        ? '<span style="color:#4ADE80; font-size:0.85rem;">[أحسنت! إجابة صحيحة]</span>' 
+        : '<span style="color:#FF6B6B; font-size:0.85rem;">[تنبيه: إجابة خاطئة - لاحظ التصحيح باللون الأخضر]</span>';
+
+      card.innerHTML = `
+        <div class="review-q-title">السؤال ${idx + 1}: ${item.questionTitle} ${statusHeader}</div>
+        ${optionsMarkup}
+      `;
+      listContainer.appendChild(card);
+    });
+  }
+
+  function toggleStudentReviewDisplay() {
+    const reviewView = document.getElementById('student-review-view');
+    reviewView.classList.toggle('hidden');
+  }
+
+  function toggleStudentMainTreeModal() {
+    const treeView = document.getElementById('student-main-tree-view');
+    treeView.classList.toggle('hidden');
+  }
+
+  function toggleStudentResultTreeModal() {
+    const treeView = document.getElementById('student-tree-view');
+    treeView.classList.toggle('hidden');
+  }
+
+  /* ================= ميزة الطالب: الاطلاع على جولاتي ================= */
+  function openStudentMyRoundsModal() {
+    const mainInput = document.getElementById('student-name-input').value.trim();
+    const searchInput = document.getElementById('my-rounds-search-input');
+    const resultsContainer = document.getElementById('my-rounds-results-container');
+    
+    document.getElementById('student-rounds-modal').classList.remove('hidden');
+    
+    if (mainInput) {
+      searchInput.value = mainInput;
+      searchStudentRoundsHistory();
+    } else {
+      resultsContainer.innerHTML = `<div style="text-align:center; padding:15px; color:var(--text-light); font-size:0.9rem;">اكتب اسمك الثلاثي في الخانة أعلاه ثم اضغط على (عرض جولاتي) للاطلاع على إجاباتك الصحيحة والخاطئة في كل جولة شاركت بها.</div>`;
+    }
+  }
+
+  function closeStudentMyRoundsModal() {
+    document.getElementById('student-rounds-modal').classList.add('hidden');
+  }
+
+  function searchStudentRoundsHistory() {
+    const rawQuery = document.getElementById('my-rounds-search-input').value.trim();
+    const container = document.getElementById('my-rounds-results-container');
+
+    if (!rawQuery) {
+      alert("فضلاً اكتب اسمك الثلاثي أولاً يا بطل!");
+      return;
+    }
+
+    const cleanQuery = normalizeArabicText(rawQuery);
+    const matchedRecords = studentResults.filter(r => {
+      const normName = normalizeArabicText(r.name);
+      return normName === cleanQuery || normName.includes(cleanQuery) || cleanQuery.includes(normName);
+    });
+
+    if (matchedRecords.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding:15px; background:#121A16; border-radius:10px; border:1px dashed #FF6B6B; color:#FF6B6B; font-weight:bold;">لم يتم العثور على جولات مسجلة باسم (${rawQuery}). تأكد من كتابة اسمك الثلاثي كما أدخلته عند بدء المسابقة.</div>`;
+      return;
+    }
+
+    matchedRecords.sort((a, b) => Number(a.round) - Number(b.round));
+
+    let html = '';
+    matchedRecords.forEach(record => {
+      const isPassed = record.status === 'متأهل';
+      const statusBadge = isPassed
+        ? `<span class="badge badge-pass">متأهل للجولة التالية 🎉</span>`
+        : `<span class="badge badge-fail">مغادر من البطولة ❌</span>`;
+
+      let detailsArray = [];
+      if (Array.isArray(record.answersDetails)) {
+        detailsArray = record.answersDetails;
+      } else if (record.answersDetails && typeof record.answersDetails === 'object') {
+        detailsArray = Object.values(record.answersDetails);
+      }
+
+      let questionsHTML = '';
+      if (detailsArray.length === 0) {
+        questionsHTML = `<div style="color:#A0AEC0; font-size:0.85rem; padding:8px;">لا تتوفر تفاصيل الأسئلة لهذه الجولة القديمة. الدرجة المسجلة: ${record.score} من ${record.total || 5}.</div>`;
+      } else {
+        detailsArray.forEach((item, idx) => {
+          const opts = Array.isArray(item.options) ? item.options : Object.values(item.options || {});
+          let optsMarkup = '';
+          opts.forEach((optText, oIdx) => {
+            let optClass = 'normal';
+            let tag = '';
+            if (oIdx === Number(item.correctIndex)) {
+              optClass = 'is-correct';
+              tag = (oIdx === Number(item.userChoiceIndex)) ? '<span>(إجابتك الصحيحة ✔️)</span>' : '<span>(الإجابة الصحيحة ✔️)</span>';
+            } else if (oIdx === Number(item.userChoiceIndex) && !item.isCorrect) {
+              optClass = 'user-wrong';
+              tag = '<span>(إجابتك الخاطئة التي سببت المغادرة ✖)</span>';
+            }
+            optsMarkup += `<div class="review-opt ${optClass}"><span>${optText}</span>${tag}</div>`;
+          });
+
+          const qBadge = item.isCorrect
+            ? '<span style="color:#4ADE80; font-size:0.82rem;">[إجابة صحيحة ✔️]</span>'
+            : '<span style="color:#FF6B6B; font-size:0.82rem;">[خطأ سبب المغادرة ✖]</span>';
+
+          questionsHTML += `
+            <div class="review-item ${item.isCorrect ? 'correct' : 'wrong'}">
+              <div class="review-q-title">السؤال ${idx + 1}: ${item.questionTitle} ${qBadge}</div>
+              ${optsMarkup}
+            </div>
+          `;
+        });
+      }
+
+      html += `
+        <div class="round-history-card">
+          <div class="round-history-header">
+            <div>
+              <strong style="color:var(--gold-accent); font-size:1rem;">الجولة ${record.round}</strong>
+              <span style="color:var(--text-light); font-size:0.85rem; margin-right:8px;">(${record.name})</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="color:white; font-weight:bold; font-size:0.9rem;">الدرجة: ${record.score} / ${record.total || 5}</span>
+              ${statusBadge}
+            </div>
+          </div>
+          ${questionsHTML}
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+  /* ================================================================== */
+
+  function renderTournamentTrees() {
+    const roundsList = [
+      { round: 1, label: "الجولة الأولى" },
+      { round: 2, label: "الجولة الثانية" },
+      { round: 3, label: "الجولة الثالثة" },
+      { round: 4, label: "الجولة الرابعة" },
+      { round: 5, label: "الجولة الختامية (الأبطال 🥇)" }
+    ];
+
+    function generateFlexibleTreeHTML() {
+      let html = '';
+      roundsList.forEach(lvl => {
+        const passers = studentResults.filter(st => parseInt(st.round) === lvl.round && st.status === 'متأهل');
+        
+        let boxes = '';
+        if (passers.length === 0) {
+          boxes = `<div class="tree-box empty">لم يتم رصد متأهلين بعد</div>`;
+        } else {
+          passers.forEach((st) => {
+            const isChamp = (lvl.round === 5 || (lvl.round === 4 && passers.length === 1));
+            boxes += `<div class="tree-box ${isChamp ? 'champion' : ''}">${st.name}</div>`;
+          });
+        }
+
+        html += `
+          <div class="tree-level-group">
+            <div class="tree-level-title">${lvl.label} (${passers.length} متأهل)</div>
+            <div class="tree-level-boxes">
+              ${boxes}
+            </div>
+          </div>
+        `;
+      });
+      return html;
+    }
+
+    const treeContent = generateFlexibleTreeHTML();
+    document.getElementById('teacher-tree-container').innerHTML = treeContent;
+    document.getElementById('student-main-tree-container').innerHTML = treeContent;
+    document.getElementById('student-tree-container').innerHTML = treeContent;
+  }
+
+  function playFireworksSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      for (let i = 0; i < 4; i++) {
+        setTimeout(() => {
+          if (ctx.state === 'suspended') ctx.resume();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(140 + Math.random() * 80, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        }, i * 180);
+      }
+    } catch(e) {}
+  }
+
+  function playKnockoutSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.5);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } catch(e) {}
+  }
+
+  function resetToHome() {
+    document.getElementById('student-name-input').value = '';
+    document.getElementById('student-tree-view').classList.add('hidden');
+    document.getElementById('student-main-tree-view').classList.add('hidden');
+    document.getElementById('student-review-view').classList.add('hidden');
+    document.getElementById('result-screen').classList.add('hidden');
+    document.getElementById('entry-screen').classList.remove('hidden');
+  }
+
+  function toggleTeacherMode() {
+    const teacherScreen = document.getElementById('teacher-screen');
+    if (teacherScreen.classList.contains('hidden')) {
+      const pass = prompt("أدخل كلمة مرور المعلم:");
+      if (pass === "1234" || pass === "عبدالله عكور") {
+        renderTeacherDashboard();
+        renderTournamentTrees();
+        renderQuestionsEditor();
+        document.getElementById('entry-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.add('hidden');
+        teacherScreen.classList.remove('hidden');
+      } else if (pass !== null) {
+        alert("كلمة المرور غير صحيحة!");
+      }
+    } else {
+      teacherScreen.classList.add('hidden');
+      document.getElementById('entry-screen').classList.remove('hidden');
+    }
+  }
+
+  function renderTeacherDashboard() {
+    const tbody = document.getElementById('results-table-body');
+    tbody.innerHTML = '';
+
+    if (studentResults.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="padding:12px; color:var(--text-light);">لا توجد مشاركات حتى الآن</td></tr>';
+      return;
+    }
+
+    studentResults.forEach(r => {
+      const tr = document.createElement('tr');
+      const badgeClass = r.status === 'متأهل' ? 'badge-pass' : 'badge-fail';
+      tr.innerHTML = `
+        <td><strong>${r.name}</strong></td>
+        <td>الجولة ${r.round}</td>
+        <td>${r.score} / ${r.total || 5}</td>
+        <td><span class="badge ${badgeClass}">${r.status}</span></td>
+        <td><button class="btn-row-view" onclick="openTeacherReviewModal('${r.id}')">👁️ عرض الإجابات</button></td>
+        <td><button class="btn-row-action" onclick="deleteStudentResult('${r.id}')">حذف وحظر 🔄</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function openTeacherReviewModal(recordId) {
+    const record = studentResults.find(item => item.id === recordId);
+    if (!record) return;
+
+    document.getElementById('modal-student-title').innerText = `تفاصيل إجابات الطالب: ${record.name} (الجولة ${record.round}) - الدرجة: ${record.score}/${record.total || 5}`;
+    const container = document.getElementById('modal-review-content');
+    container.innerHTML = '';
+
+    let detailsArray = [];
+    if (Array.isArray(record.answersDetails)) {
+      detailsArray = record.answersDetails;
+    } else if (record.answersDetails && typeof record.answersDetails === 'object') {
+      detailsArray = Object.values(record.answersDetails);
+    }
+
+    if (detailsArray.length === 0) {
+      container.innerHTML = `
+        <div style="padding:15px; text-align:center; background:#121A16; border-radius:10px; border:1px dashed var(--gold-accent);">
+          <p style="color:var(--gold-accent); font-weight:bold; margin-bottom:6px;">ℹ️ هذه المشاركة مسجلة قبل تحديث حفظ تفاصيل الأسئلة.</p>
+          <p style="color:var(--text-light); font-size:0.9rem;">النتيجة الإجمالية المسجلة للطالب: <strong>${record.score} من ${record.total || 5}</strong> (${record.status}).</p>
+          <p style="color:#A0AEC0; font-size:0.85rem; margin-top:6px;">أي مشاركة جديدة من الآن فصاعداً ستظهر هنا بتفاصيل كل سؤال وإجابة الطالب والإجابة الصحيحة فوراً.</p>
+        </div>
+      `;
+    } else {
+      detailsArray.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = `review-item ${item.isCorrect ? 'correct' : 'wrong'}`;
+
+        const opts = Array.isArray(item.options) ? item.options : Object.values(item.options || {});
+        let optionsMarkup = '';
+        opts.forEach((optText, oIdx) => {
+          let optClass = 'normal';
+          let badgeTag = '';
+
+          if (oIdx === Number(item.correctIndex)) {
+            optClass = 'is-correct';
+            badgeTag = (oIdx === Number(item.userChoiceIndex)) 
+              ? '<span>(إجابة الطالب الصحيحة ✔️)</span>' 
+              : '<span>(الإجابة الصحيحة ✔️)</span>';
+          } else if (oIdx === Number(item.userChoiceIndex) && !item.isCorrect) {
+            optClass = 'user-wrong';
+            badgeTag = '<span>(إجابة الطالب الخاطئة ✖)</span>';
+          }
+
+          optionsMarkup += `
+            <div class="review-opt ${optClass}">
+              <span>${optText}</span>
+              ${badgeTag}
+            </div>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="review-q-title">السؤال ${idx + 1}: ${item.questionTitle}</div>
+          ${optionsMarkup}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById('teacher-review-modal').classList.remove('hidden');
+  }
+
+  function closeTeacherReviewModal() {
+    document.getElementById('teacher-review-modal').classList.add('hidden');
+  }
+
+  function deleteStudentResult(recordId) {
+    if (confirm("هل أنت متأكد من حذف هذه الإجابة وإعطاء الطالب فرصة محاولة جديدة؟")) {
+      db.ref(`student_results/${recordId}`).remove().then(() => {
+        alert("تم حذف إجابة الطالب بنجاح ويمكنه الدخول مجدداً الآن!");
+      });
+    }
+  }
+
+  function grantSpecialAccess() {
+    const name = document.getElementById('override-student-name').value.trim();
+    const roundNum = document.getElementById('override-round-num').value;
+    if (!name) {
+      alert("يرجى كتابة اسم الطالب أولاً!");
+      return;
+    }
+
+    db.ref('special_permissions').push({
+      name: name,
+      round: roundNum
+    }).then(() => {
+      alert(`تم فتح الجولة ${roundNum} للطالب (${name}) بنجاح استثنائي!`);
+      document.getElementById('override-student-name').value = '';
+    });
+  }
+
+  /* ================= وظائف بنك الأسئلة واستيراد دروس منصة مدرستي ================= */
+  function toggleQuestionBankPanel() {
+    const panel = document.getElementById('question-bank-panel');
+    panel.classList.toggle('hidden');
+  }
+
+  function previewBankLesson() {
+    const lessonKey = document.getElementById('madrasati-lesson-select').value;
+    const container = document.getElementById('bank-lesson-preview-container');
+    container.innerHTML = '';
+
+    if (!lessonKey || !madrasatiLessonsBank[lessonKey]) return;
+
+    const questions = madrasatiLessonsBank[lessonKey];
+    let slotOptions = `<option value="append">➕ إضافة كسؤال جديد</option>`;
+    activeQuestions.forEach((_, i) => {
+      slotOptions += `<option value="${i}">استبدال سؤال ${i + 1}</option>`;
+    });
+
+    questions.forEach((qItem, idx) => {
+      const div = document.createElement('div');
+      div.className = 'bank-q-preview';
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap;">
+          <strong style="color:var(--text-light);">${idx + 1}. ${qItem.q}</strong>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <span style="font-size:0.75rem; color:var(--gold-accent);">الموضع:</span>
+            <select id="bank-target-slot-${idx}" style="padding:2px 5px; border-radius:4px; background:#121A16; color:white; border:1px solid var(--text-light); font-size:0.75rem;">
+              ${slotOptions}
+            </select>
+            <button class="btn-mini" onclick="importSingleBankQuestion('${lessonKey}', ${idx})">استيراد ↙️</button>
+          </div>
+        </div>
+        <div style="margin-top:4px; font-size:0.8rem; color:#A0AEC0;">
+          الخيارات: ${qItem.options.map((o, i) => i === qItem.correct ? `<span style="color:#4ADE80; font-weight:bold;">[${o} ✔️]</span>` : o).join(' | ')}
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function importSingleBankQuestion(lessonKey, qIdx) {
+    syncCurrentEditorToMemory();
+    const qObj = madrasatiLessonsBank[lessonKey][qIdx];
+    const targetVal = document.getElementById(`bank-target-slot-${qIdx}`).value;
+    const newQ = {
+      q: qObj.q,
+      options: [...qObj.options],
+      correct: qObj.correct
+    };
+
+    if (targetVal === "append") {
+      activeQuestions.push(newQ);
+      renderQuestionsEditor();
+      alert(`✅ تم إضافة السؤال كسؤال جديد (رقم ${activeQuestions.length}) في المحرر أدناه!`);
+    } else {
+      const targetSlot = parseInt(targetVal);
+      activeQuestions[targetSlot] = newQ;
+      renderQuestionsEditor();
+      alert(`✅ تم استيراد السؤال إلى (السؤال ${targetSlot + 1}) في المحرر أدناه!`);
+    }
+  }
+
+  function importAllFromSelectedLesson() {
+    const lessonKey = document.getElementById('madrasati-lesson-select').value;
+    if (!lessonKey || !madrasatiLessonsBank[lessonKey]) {
+      alert("فضلاً اختر درساً من القائمة أولاً!");
+      return;
+    }
+    activeQuestions = madrasatiLessonsBank[lessonKey].map(item => ({
+      q: item.q,
+      options: [...item.options],
+      correct: item.correct
+    }));
+    renderQuestionsEditor();
+    alert("✅ تم استيراد أسئلة الدرس بالكامل إلى المحرر! لا تنسَ الضغط على (حفظ تعديلات الأسئلة سحابياً) لاعتمادها للطلاب.");
+  }
+
+  function parseAndImportPastedQuestion() {
+    syncCurrentEditorToMemory();
+    const rawText = document.getElementById('quick-paste-madrasati').value.trim();
+    if (!rawText) {
+      alert("فضلاً الصق نص السؤال وخياراته الأربعة أولاً!");
+      return;
+    }
+    const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length < 5) {
+      alert("يرجى إدخال السؤال في السطر الأول، ثم 4 خيارات في 4 أسطر متتالية (5 أسطر إجمالاً).");
+      return;
+    }
+
+    const qText = lines[0];
+    let opts = [];
+    let correctIdx = 0;
+
+    for (let i = 1; i <= 4; i++) {
+      let optLine = lines[i];
+      if (optLine.includes('*')) {
+        correctIdx = i - 1;
+        optLine = optLine.replace(/\*/g, '').trim();
+      }
+      opts.push(optLine);
+    }
+
+    const slotVal = document.getElementById('replace-slot-select').value;
+    const newQ = {
+      q: qText,
+      options: opts,
+      correct: correctIdx
+    };
+
+    if (slotVal === "append") {
+      activeQuestions.push(newQ);
+      renderQuestionsEditor();
+      document.getElementById('quick-paste-madrasati').value = '';
+      alert(`✅ تم إضافة السؤال الجديد (رقم ${activeQuestions.length}) بنجاح! لا تنسَ الضغط على زر الحفظ السحابي.`);
+    } else {
+      const slot = parseInt(slotVal);
+      activeQuestions[slot] = newQ;
+      renderQuestionsEditor();
+      document.getElementById('quick-paste-madrasati').value = '';
+      alert(`✅ تم إدراج السؤال في (السؤال ${slot + 1}) بنجاح! لا تنسَ الضغط على زر الحفظ السحابي.`);
+    }
+  }
+  /* ============================================================================ */
+
+  // مزامنة التعديلات المكتوبة في حقول المحرر قبل إضافة أو حذف أي سؤال حتى لا تضيع كتابة المعلم
+  function syncCurrentEditorToMemory() {
+    const updated = [];
+    activeQuestions.forEach((qObj, qIdx) => {
+      const titleEl = document.getElementById(`q_title_${qIdx}`);
+      if (!titleEl) {
+        updated.push(qObj);
+        return;
+      }
+      const qTitle = titleEl.value;
+      const opts = [];
+      for (let o = 0; o < 4; o++) {
+        const optEl = document.getElementById(`q_${qIdx}_opt_${o}`);
+        opts.push(optEl ? optEl.value : (qObj.options[o] || ""));
+      }
+      const radios = document.getElementsByName(`correct_q_${qIdx}`);
+      let correctIdx = qObj.correct || 0;
+      radios.forEach(r => {
+        if (r.checked) correctIdx = parseInt(r.value);
+      });
+      updated.push({ q: qTitle, options: opts, correct: correctIdx });
+    });
+    activeQuestions = updated;
+  }
+
+  function updateReplaceSlotDropdown() {
+    const sel = document.getElementById('replace-slot-select');
+    if (!sel) return;
+    let html = `<option value="append">➕ إضافة كسؤال جديد</option>`;
+    activeQuestions.forEach((_, idx) => {
+      html += `<option value="${idx}">استبدال السؤال ${idx + 1}</option>`;
+    });
+    sel.innerHTML = html;
+  }
+
+  function addNewQuestionToEditor() {
+    syncCurrentEditorToMemory();
+    activeQuestions.push({
+      q: "",
+      options: ["", "", "", ""],
+      correct: 0
+    });
+    renderQuestionsEditor();
+  }
+
+  function removeQuestionFromEditor(qIdx) {
+    if (activeQuestions.length <= 1) {
+      alert("يجب أن تحتوي الجولة على سؤال واحد على الأقل!");
+      return;
+    }
+    if (confirm(`هل تريد استبعاد وحذف (السؤال ${qIdx + 1}) من الجولة؟`)) {
+      syncCurrentEditorToMemory();
+      activeQuestions.splice(qIdx, 1);
+      renderQuestionsEditor();
+    }
+  }
+
+  function renderQuestionsEditor() {
+    const container = document.getElementById('questions-editor-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    activeQuestions.forEach((qObj, qIdx) => {
+      const card = document.createElement('div');
+      card.className = 'question-editor-card';
+      
+      let optionsHTML = '';
+      qObj.options.forEach((optText, optIdx) => {
+        const isCorrect = (Number(qObj.correct) === optIdx);
+        optionsHTML += `
+          <div class="option-edit-row">
+            <input type="radio" name="correct_q_${qIdx}" value="${optIdx}" ${isCorrect ? 'checked' : ''} onchange="highlightCorrectOption(${qIdx}, ${optIdx})" title="حدد كخيار صحيح">
+            <input type="text" id="q_${qIdx}_opt_${optIdx}" value="${optText.replace(/"/g, '&quot;')}" placeholder="اكتب الخيار ${optIdx + 1}" style="margin:0; ${isCorrect ? 'border-color:#81c784; background:#1b3827;' : ''}">
+          </div>
+        `;
+      });
+
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label style="color:var(--gold-accent); font-weight:bold; font-size:0.95rem;">السؤال ${qIdx + 1}:</label>
+          <button type="button" class="btn-del-q" onclick="removeQuestionFromEditor(${qIdx})">🗑️ استبعاد السؤال</button>
+        </div>
+        <input type="text" id="q_title_${qIdx}" value="${qObj.q.replace(/"/g, '&quot;')}" placeholder="اكتب نص السؤال هنا...">
+        <label style="color:var(--text-light); font-size:0.8rem; display:block; margin-bottom:6px;">الخيارات الأربعة (ضع الدائرة بجانب الإجابة الصحيحة):</label>
+        ${optionsHTML}
+      `;
+      container.appendChild(card);
+    });
+
+    updateReplaceSlotDropdown();
+  }
+
+  function highlightCorrectOption(qIdx, selectedOptIdx) {
+    for (let o = 0; o < 4; o++) {
+      const inp = document.getElementById(`q_${qIdx}_opt_${o}`);
+      if (inp) {
+        if (o === selectedOptIdx) {
+          inp.style.borderColor = '#81c784';
+          inp.style.background = '#1b3827';
+        } else {
+          inp.style.borderColor = 'var(--text-light)';
+          inp.style.background = '#121A16';
+        }
+      }
+    }
+  }
+
+  function saveEditedQuestions() {
+    let updatedQs = [];
+
+    for (let qIdx = 0; qIdx < activeQuestions.length; qIdx++) {
+      const qTitle = document.getElementById(`q_title_${qIdx}`).value.trim();
+      if (!qTitle) {
+        alert(`يرجى كتابة نص السؤال رقم (${qIdx + 1}) قبل الحفظ!`);
+        return;
+      }
+
+      let opts = [];
+      for (let o = 0; o < 4; o++) {
+        const optVal = document.getElementById(`q_${qIdx}_opt_${o}`).value.trim();
+        if (!optVal) {
+          alert(`يرجى إكمال جميع الخيارات الأربعة للسؤال رقم (${qIdx + 1}) قبل الحفظ!`);
+          return;
+        }
+        opts.push(optVal);
+      }
+      
+      const radios = document.getElementsByName(`correct_q_${qIdx}`);
+      let correctIdx = 0;
+      radios.forEach(r => {
+        if (r.checked) correctIdx = parseInt(r.value);
+      });
+
+      updatedQs.push({
+        q: qTitle,
+        options: opts,
+        correct: correctIdx
+      });
+    }
+
+    activeQuestions = updatedQs;
+    saveSettingsToCloud();
+  }
+
+  function saveSettingsToCloud() {
+    const roundNum = document.getElementById('select-round-num').value;
+    const timeVal = document.getElementById('select-time-duration').value;
+    const statusVal = document.getElementById('select-round-status').value === "open";
+
+    db.ref('championship_settings').set({
+      round: roundNum,
+      duration: timeVal,
+      isOpen: statusVal,
+      questions: activeQuestions
+    }).then(() => {
+      alert("✅ تم حفظ وتعميم الإعدادات والأسئلة سحابياً بنجاح!");
+    }).catch(err => {
+      alert("حدث خطأ في الاتصال: " + err.message);
+    });
+  }
+
+  function clearCloudResults() {
+    if (confirm("هل أنت متأكد من مسح جميع نتائج الطلاب المباشرة وإعادة مسابقة البطولة للجميع؟")) {
+      db.ref('student_results').remove();
+      db.ref('special_permissions').remove().then(() => {
+        alert("🗑️ تمت تصفية جميع النتائج والصلاحيات بنجاح!");
+      });
+    }
+  }
+
+  function exportToCSV() {
+    if (studentResults.length === 0) {
+      alert("لا توجد نتائج لتصديرها حالياً!");
+      return;
+    }
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+    csvContent += "اسم الطالب الثلاثي,الجولة,الدرجة,الحالة,التاريخ\r\n";
+    studentResults.forEach(r => {
+      csvContent += `"${r.name}","الجولة ${r.round}","${r.score}/${r.total || 5}","${r.status}","${r.date}"\r\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `نتائج_بطولة_لغتي_الصف_ثالث1.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function exportToPDF(filterType) {
+    let list = studentResults;
+    let title = "كشف نتائج جميع الطلاب";
+    if (filterType === 'passed') {
+      list = studentResults.filter(r => r.status === 'متأهل');
+      title = "كشف الطلاب المتأهلين للسباق";
+    }
+
+    if (list.length === 0) {
+      alert("لا توجد نتائج للطباعة في هذه الفئة!");
+      return;
+    }
+
+    let printWin = window.open('', '', 'width=800,height=600');
+    let html = `
+      <html dir="rtl" lang="ar">
+      <head>
+        <title>${title}</title>
+        <style>
+          body { font-family: 'Tajawal', sans-serif; padding: 20px; text-align: center; }
+          h2 { color: #182B20; margin-bottom: 5px; }
+          h4 { color: #555; margin-top: 0; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #333; padding: 8px; text-align: center; }
+          th { background-color: #f2f2f2; }
+        </style>
+      </head>
+      <body>
+        <h2>🏆 بطولة لغتي التنافسية - الصف ثالث/1 🏆</h2>
+        <h4>المعلم: عبدالله عكور | ${title}</h4>
+        <hr>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم الطالب الثلاثي</th>
+              <th>الجولة</th>
+              <th>الدرجة</th>
+              <th>الحالة</th>
+              <th>التاريخ</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    list.forEach((r, idx) => {
+      html += `
+        <tr>
+          <td>${idx + 1}</td>
+          <td><strong>${r.name}</strong></td>
+          <td>الجولة ${r.round}</td>
+          <td>${r.score} / ${r.total || 5}</td>
+          <td>${r.status}</td>
+          <td>${r.date}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+
+    printWin.document.write(html);
+    printWin.document.close();
+    printWin.focus();
+    setTimeout(() => { printWin.print(); }, 500);
+  }
+</script>
+
+</body>
+</html>
